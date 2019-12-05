@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: c7-calc
+  labels:
+    app: c7-calc
+spec:
+  selector:
+    matchLabels:
+      app: c7-calc
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: c7-calc
+      annotations:
+        # Estas anotaciones activan el monitoreo automatico con Prometheus
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/actuator/prometheus'
+        prometheus.io/port: '8080'
+    spec:
+      containers:
+        - name: app
+          image: circulo7/devops-calc:0.0.1
+          resources:
+            limits:
+              cpu: 400m
+              memory: 256Mi
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              #cuantos segundos espera para empezar a verificar
+            initialDelaySeconds: 40
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            timeoutSeconds: 1

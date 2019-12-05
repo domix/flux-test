@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: c7-calc
+  labels:
+    app: c7-calc
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: c7-calc
